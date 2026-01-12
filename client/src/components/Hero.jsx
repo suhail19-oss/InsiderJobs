@@ -1,6 +1,20 @@
+import { useContext, useRef } from "react";
 import { assets } from "../assets/assets";
+import { AppContext } from "../context/AppContext";
 
 function Hero() {
+  const { setSearchFilter, setIsSearched } = useContext(AppContext);
+  const titleRef = useRef(null);
+  const locationRef = useRef(null);
+
+  const onSearch = () => {
+    setSearchFilter({
+      title: titleRef.current.value,
+      location: locationRef.current.value,
+    });
+    setIsSearched(true);
+  };
+
   return (
     <>
       <div className="container 2xl:px-20 mx-auto my-20">
@@ -36,6 +50,7 @@ function Hero() {
                     type="text"
                     placeholder="Job title or keyword"
                     className="w-full bg-transparent text-sm outline-none"
+                    ref={titleRef}
                   />
                 </div>
 
@@ -51,10 +66,14 @@ function Hero() {
                     type="text"
                     placeholder="City or remote"
                     className="w-full bg-transparent text-sm outline-none"
+                    ref={locationRef}
                   />
                 </div>
 
-                <button className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-10 py-3 text-white text-sm font-semibold transition-all hover:shadow-xl hover:scale-[1.02] active:scale-95 cursor-pointer">
+                <button
+                  onClick={onSearch}
+                  className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-10 py-3 text-white text-sm font-semibold transition-all hover:shadow-xl hover:scale-[1.02] active:scale-95 cursor-pointer"
+                >
                   Explore Jobs
                 </button>
               </div>
