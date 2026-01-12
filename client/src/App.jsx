@@ -7,10 +7,11 @@ import Applications from "./pages/Applications";
 function App() {
   return (
     <div>
-      <Routes></Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/apply-job/:id" element={<ApplyJob />} />
-      <Route path="/applications" element={<Applications />} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/apply-job/:id" element={<ApplyJob />} />
+        <Route path="/applications" element={<Applications />} />
+      </Routes>
     </div>
   );
 }
