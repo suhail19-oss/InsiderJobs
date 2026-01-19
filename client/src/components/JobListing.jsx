@@ -1,6 +1,12 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
-import { assets, JobCategories, JobLocations } from "../assets/assets";
+import {
+  assets,
+  JobCategories,
+  JobLocations,
+  jobsData,
+} from "../assets/assets";
+import JobCard from "./JobCard";
 
 function JobListing() {
   const { isSearched, searchFilter, setSearchFilter } = useContext(AppContext);
@@ -207,7 +213,31 @@ function JobListing() {
             </div>
           </aside>
 
-          <section className="flex-1 bg-white rounded-2xl border border-slate-100 p-8 min-h-[600px]" />
+          <section className="flex-1">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 min-h-[600px]">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h3
+                    className="text-2xl font-bold text-slate-900"
+                    id="job-list"
+                  >
+                    Latest Jobs
+                  </h3>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Find Opportunities from Top Companies Worldwide
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-px bg-slate-100 mb-8" />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {jobsData.map((job, index) => (
+                  <JobCard key={index} job={job} />
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
