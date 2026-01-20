@@ -32,11 +32,11 @@ function JobCard({ job }) {
       />
 
       <div className="flex items-center gap-3">
-        <button className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg transition">
+        <button className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg transition hover:shadow-md">
           Apply Now
         </button>
 
-        <button className="flex-1 cursor-pointer border border-slate-200 hover:border-blue-400 hover:text-blue-600 text-slate-700 text-sm font-medium py-2.5 rounded-lg transition">
+        <button className="flex-1 cursor-pointer border border-slate-200 hover:border-blue-400 hover:text-blue-600 text-slate-700 text-sm font-medium py-2.5 rounded-lg transition hover:shadow-md">
           Learn More
         </button>
       </div>

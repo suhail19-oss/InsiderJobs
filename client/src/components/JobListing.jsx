@@ -11,6 +11,8 @@ function JobListing() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
+  const [openCategories, setOpenCategories] = useState(true);
+  const [openLocations, setOpenLocations] = useState(true);
   const JOBS_PER_PAGE = 6;
   const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
 
@@ -41,7 +43,7 @@ function JobListing() {
       <div className="container mx-auto 2xl:px-20 px-4 pb-10">
         <div className="flex flex-col lg:flex-row gap-10">
           <aside className="w-full lg:w-1/4">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 sticky top-24 max-h-[calc(100vh-6rem)] flex flex-col">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 sticky top-24">
               <div className="p-6 border-b border-slate-100">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-slate-900">Filters</h2>
@@ -50,7 +52,7 @@ function JobListing() {
                     selectedLocations.length > 0) && (
                     <button
                       onClick={clearFilters}
-                      className="text-xs font-medium text-blue-600 hover:text-blue-800 underline underline-offset-4"
+                      className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:opacity-90 underline underline-offset-4 cursor-pointer transition"
                     >
                       Clear All
                     </button>
@@ -110,120 +112,147 @@ function JobListing() {
                 </button>
 
                 <div className={`${showFilter ? "block" : "hidden"} lg:block`}>
-                  <div className="mb-10">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">
+                  <div className="p-3 border-b border-slate-100">
+                    <button
+                      onClick={() => setOpenCategories((p) => !p)}
+                      className="w-full flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4"
+                    >
                       Categories
-                    </h4>
-                    <ul className="space-y-2">
-                      {JobCategories.map((category, index) => {
-                        const isChecked = selectedCategories.includes(category);
-                        return (
-                          <li key={index}>
-                            <label
-                              className={`relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${
-                                isChecked
-                                  ? "bg-blue-50 text-blue-700"
-                                  : "hover:bg-slate-50 text-slate-700"
-                              }`}
-                            >
-                              {isChecked && (
-                                <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-blue-600" />
-                              )}
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => handleCategoryChange(category)}
-                                className="hidden"
-                              />
-                              <div
-                                className={`w-5 h-5 flex items-center justify-center rounded-md ${
+                      <span className="text-lg">
+                        {openCategories ? "−" : "+"}
+                      </span>
+                    </button>
+
+                    {openCategories && (
+                      <ul className="space-y-2">
+                        {JobCategories.map((category, index) => {
+                          const isChecked =
+                            selectedCategories.includes(category);
+                          return (
+                            <li key={index}>
+                              <label
+                                className={`relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition ${
                                   isChecked
-                                    ? "bg-blue-600"
-                                    : "bg-white border border-slate-300"
+                                    ? "bg-blue-50 text-blue-700"
+                                    : "hover:bg-slate-50 text-slate-700"
                                 }`}
                               >
-                                <svg
-                                  className={`w-3.5 h-3.5 text-white ${
-                                    isChecked ? "opacity-100" : "opacity-0"
+                                {isChecked && (
+                                  <span className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 rounded-r" />
+                                )}
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() =>
+                                    handleCategoryChange(category)
+                                  }
+                                  className="hidden"
+                                />
+                                <div
+                                  className={`w-5 h-5 rounded-md flex items-center justify-center ${
+                                    isChecked
+                                      ? "bg-blue-600"
+                                      : "border border-slate-300 bg-white"
                                   }`}
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="3"
-                                  viewBox="0 0 24 24"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              </div>
-                              <span className="text-sm font-medium">
-                                {category}
-                              </span>
-                            </label>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                                  <svg
+                                    className={`w-3.5 h-3.5 text-white ${
+                                      isChecked ? "opacity-100" : "opacity-0"
+                                    }`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                </div>
+                                <span className="text-sm font-medium">
+                                  {category}
+                                </span>
+                              </label>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </div>
 
-                  <div>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">
+                  <div className="p-3 border-b border-slate-100">
+                    <button
+                      onClick={() => setOpenLocations((prev) => !prev)}
+                      className="w-full flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4"
+                    >
                       Locations
-                    </h4>
-                    <ul className="space-y-2">
-                      {JobLocations.map((location, index) => {
-                        const isChecked = selectedLocations.includes(location);
-                        return (
-                          <li key={index}>
-                            <label
-                              className={`relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${
-                                isChecked
-                                  ? "bg-blue-50 text-blue-700"
-                                  : "hover:bg-slate-50 text-slate-700"
-                              }`}
-                            >
-                              {isChecked && (
-                                <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-blue-600" />
-                              )}
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => handleLocationChange(location)}
-                                className="hidden"
-                              />
-                              <div
-                                className={`w-5 h-5 flex items-center justify-center rounded-md ${
+                      <span className="text-lg">
+                        {openLocations ? "−" : "+"}
+                      </span>
+                    </button>
+
+                    {openLocations && (
+                      <ul className="space-y-2">
+                        {JobLocations.map((location, index) => {
+                          const isChecked =
+                            selectedLocations.includes(location);
+                          return (
+                            <li key={index}>
+                              <label
+                                className={`relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition ${
                                   isChecked
-                                    ? "bg-blue-600"
-                                    : "bg-white border border-slate-300"
+                                    ? "bg-blue-50 text-blue-700"
+                                    : "hover:bg-slate-50 text-slate-700"
                                 }`}
                               >
-                                <svg
-                                  className={`w-3.5 h-3.5 text-white ${
-                                    isChecked ? "opacity-100" : "opacity-0"
+                                {isChecked && (
+                                  <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-blue-600" />
+                                )}
+
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() =>
+                                    handleLocationChange(location)
+                                  }
+                                  className="hidden"
+                                />
+
+                                <div
+                                  className={`w-5 h-5 flex items-center justify-center rounded-md ${
+                                    isChecked
+                                      ? "bg-blue-600"
+                                      : "bg-white border border-slate-300"
                                   }`}
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="3"
-                                  viewBox="0 0 24 24"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              </div>
-                              <span className="text-sm font-medium">
-                                {location}
-                              </span>
-                            </label>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                                  <svg
+                                    className={`w-3.5 h-3.5 text-white ${
+                                      isChecked ? "opacity-100" : "opacity-0"
+                                    }`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                </div>
+
+                                <span className="text-sm font-medium">
+                                  {location}
+                                </span>
+                              </label>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </div>
@@ -246,6 +275,7 @@ function JobListing() {
                     <JobCard key={index} job={job} />
                   ))}
               </div>
+
               {jobs.length > 0 && totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-10">
                   <button
@@ -253,7 +283,11 @@ function JobListing() {
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     className="p-2 rounded border border-slate-300 disabled:opacity-40"
                   >
-                    <img src={assets.left_arrow_icon} alt="" />
+                    <img
+                      src={assets.left_arrow_icon}
+                      alt=""
+                      className="cursor-pointer"
+                    />
                   </button>
 
                   {Array.from({ length: totalPages }).map((_, index) => {
@@ -262,7 +296,7 @@ function JobListing() {
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`w-10 h-10 rounded border text-sm font-medium transition ${
+                        className={`w-10 h-10 rounded border text-sm font-medium transition cursor-pointer ${
                           currentPage === page
                             ? "bg-blue-600 text-white border-blue-600"
                             : "border-slate-300 text-slate-600 hover:bg-slate-100"
@@ -278,9 +312,13 @@ function JobListing() {
                     onClick={() =>
                       setCurrentPage((p) => Math.min(totalPages, p + 1))
                     }
-                    className="p-2 rounded border border-slate-300 disabled:opacity-40"
+                    className="p-2 rounded border border-slate-300 disabled:opacity-40 cursor-pointer"
                   >
-                    <img src={assets.right_arrow_icon} alt="" />
+                    <img
+                      src={assets.right_arrow_icon}
+                      alt=""
+                      className="cursor-pointer"
+                    />
                   </button>
                 </div>
               )}

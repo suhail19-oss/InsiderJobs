@@ -90,7 +90,7 @@ function Hero() {
           </span>
         </div>
 
-        <div className="flex items-center justify-center gap-6 sm:gap-10 overflow-x-auto whitespace-nowrap pt-2 pb-4">
+        <div className="flex items-center justify-center gap-6 sm:gap-10 overflow-x-auto whitespace-nowrap pt-2 pb-1">
           {[
             assets.microsoft_logo,
             assets.accenture_logo,
