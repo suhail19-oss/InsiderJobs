@@ -1,10 +1,10 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { assets, JobCategories, JobLocations } from "../assets/assets";
 import JobCard from "./JobCard";
 
 function JobListing() {
-  const { isSearched, searchFilter, setSearchFilter, jobs } =
+  const { isSearched, setIsSearched, searchFilter, setSearchFilter, jobs } =
     useContext(AppContext);
 
   const [showFilter, setShowFilter] = useState(false);
@@ -13,8 +13,9 @@ function JobListing() {
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [openCategories, setOpenCategories] = useState(true);
   const [openLocations, setOpenLocations] = useState(true);
+  const [filteredJobs, setFilteredJobs] = useState(jobs);
   const JOBS_PER_PAGE = 6;
-  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
+  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
 
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
@@ -36,8 +37,39 @@ function JobListing() {
     setSearchFilter({ title: "", location: "" });
     setSelectedCategories([]);
     setSelectedLocations([]);
+    setIsSearched(false);
+    setCurrentPage(1);
   };
 
+  useEffect(() => {
+    const matchesCategory = (job) =>
+      selectedCategories.length == 0 ||
+      selectedCategories.includes(job.category);
+
+    const matchesLocation = (job) =>
+      selectedLocations.length === 0 ||
+      selectedLocations.includes(job.location);
+
+    const matchesTitle = (job) =>
+      searchFilter.title === "" ||
+      job.title.toLowerCase().includes(searchFilter.title.toLowerCase());
+
+    const matchesSearchLocation = (job) =>
+      searchFilter.location === "" ||
+      job.location.toLowerCase().includes(searchFilter.location.toLowerCase());
+
+    const newFilteredJobs = jobs
+      .slice()
+      .reverse()
+      .filter(
+        (job) =>
+          matchesCategory(job) &&
+          matchesLocation(job) &&
+          matchesTitle(job) &&
+          matchesSearchLocation(job),
+      );
+    setFilteredJobs(newFilteredJobs);
+  }, [jobs, selectedCategories, selectedLocations, searchFilter]);
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="container mx-auto 2xl:px-20 px-4 pb-10">
@@ -47,12 +79,14 @@ function JobListing() {
               <div className="p-6 border-b border-slate-100">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-slate-900">Filters</h2>
-                  {(isSearched ||
+
+                  {(searchFilter.title ||
+                    searchFilter.location ||
                     selectedCategories.length > 0 ||
                     selectedLocations.length > 0) && (
                     <button
                       onClick={clearFilters}
-                      className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:opacity-90 underline underline-offset-4 cursor-pointer transition"
+                      className="text-xs font-medium text-blue-600 hover:text-blue-800 underline underline-offset-4 cursor-pointer transition"
                     >
                       Clear All
                     </button>
@@ -84,6 +118,7 @@ function JobListing() {
                             />
                           </span>
                         )}
+
                         {searchFilter.location && (
                           <span className="flex items-center gap-2 bg-rose-50 border border-rose-100 text-rose-700 px-3 py-1 rounded-full text-sm font-medium">
                             {searchFilter.location}
@@ -268,15 +303,41 @@ function JobListing() {
                 Find Opportunities from Top Companies Worldwide
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {jobs
-                  .slice((currentPage - 1) * 6, currentPage * 6)
-                  .map((job, index) => (
-                    <JobCard key={index} job={job} />
-                  ))}
-              </div>
+              {filteredJobs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <img
+                    src={assets.search_icon}
+                    alt=""
+                    className="w-14 h-14 opacity-40 mb-4"
+                  />
 
-              {jobs.length > 0 && totalPages > 1 && (
+                  <h4 className="text-lg font-semibold text-slate-800 mb-2">
+                    No jobs found
+                  </h4>
+
+                  <p className="text-sm text-slate-500 max-w-sm">
+                    We couldn’t find any jobs matching your selected filters.
+                    Try adjusting or clearing the filters to see more results.
+                  </p>
+
+                  <button
+                    onClick={clearFilters}
+                    className="mt-6 px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredJobs
+                    .slice((currentPage - 1) * 6, currentPage * 6)
+                    .map((job, index) => (
+                      <JobCard key={index} job={job} />
+                    ))}
+                </div>
+              )}
+
+              {filteredJobs.length > 0 && totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-10">
                   <button
                     disabled={currentPage === 1}
