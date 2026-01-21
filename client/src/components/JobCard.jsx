@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function JobCard({ job }) {
   const navigate = useNavigate();
   return (
-    <div className="group bg-white border border-slate-100 rounded-2xl p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-blue-200 flex flex-col">
+    <div className="group bg-white border border-slate-300 rounded-lg p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-blue-300 flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <img
           src={assets.company_icon}
@@ -29,7 +29,7 @@ function JobCard({ job }) {
       <p
         className="text-sm text-slate-600 leading-relaxed flex-1"
         dangerouslySetInnerHTML={{
-          __html: job.description.slice(0, 200) + "...",
+          __html: job.description.slice(0, 150) + "...",
         }}
       />
 
@@ -39,7 +39,7 @@ function JobCard({ job }) {
             navigate(`/apply-job/${job._id}`);
             scrollTo(0, 0);
           }}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg transition cursor-pointer"
+          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-lg transition cursor-pointer"
         >
           Apply Now
         </button>

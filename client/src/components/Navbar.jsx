@@ -1,16 +1,21 @@
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { assets } from "../assets/assets";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const { openSignIn } = useClerk();
   const { user } = useUser();
-
+  const navigate = useNavigate();
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <nav className="container mx-auto px-4 2xl:px-20 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={assets.logo} alt="Logo" className="h-8 sm:h-9" />
+          <img
+            onClick={() => navigate("/")}
+            src={assets.logo}
+            alt="Logo"
+            className="h-8 sm:h-9 cursor-pointer"
+          />
         </Link>
 
         {user ? (

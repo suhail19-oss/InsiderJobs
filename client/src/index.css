@@ -4,3 +4,9 @@
 * {
   font-family: Montserrat;
 }
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
