@@ -50,7 +50,7 @@ function Navbar() {
               onClick={(e) => setShowRecruiterLogin(true)}
               className="
                 px-4 py-2 rounded-full
-                border border-gray-300
+                border border-gray-500
                 text-gray-700
                 hover:border-blue-600 hover:text-blue-600
                 hover:bg-blue-50
