@@ -29,8 +29,6 @@ function ApplyJob() {
 
   return JobData ? (
     <>
-      <Navbar />
-
       <div className="min-h-screen bg-slate-50 px-4 py-10">
         <div className="max-w-6xl mx-auto space-y-10">
           <div className="bg-white border-2 border-slate-300 rounded-lg shadow-none overflow-hidden">

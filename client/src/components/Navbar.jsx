@@ -1,11 +1,15 @@
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { assets } from "../assets/assets";
 import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext.jsx";
 
 function Navbar() {
   const { openSignIn } = useClerk();
   const { user } = useUser();
   const navigate = useNavigate();
+  const { setShowRecruiterLogin } = useContext(AppContext);
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <nav className="container mx-auto px-4 2xl:px-20 py-4 flex items-center justify-between">
@@ -43,6 +47,7 @@ function Navbar() {
         ) : (
           <div className="flex items-center gap-3 sm:gap-5 text-sm">
             <button
+              onClick={(e) => setShowRecruiterLogin(true)}
               className="
                 px-4 py-2 rounded-full
                 border border-gray-300
