@@ -12,32 +12,34 @@ function ViewApplications() {
         </p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-visible">
-        <div className="overflow-x-auto overflow-y-visible">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-6 py-4 text-sm font-semibold text-slate-700">
-                  S.No.
-                </th>
-                <th className="px-6 py-4 text-sm font-semibold text-slate-700">
-                  User Name
-                </th>
-                <th className="px-6 py-4 text-sm font-semibold text-slate-700 max-sm:hidden">
-                  Job Title
-                </th>
-                <th className="px-6 py-4 text-sm font-semibold text-slate-700 max-sm:hidden">
-                  Location
-                </th>
-                <th className="px-6 py-4 text-sm font-semibold text-slate-700">
-                  Resume
-                </th>
-                <th className="px-6 py-4 text-sm font-semibold text-slate-700 text-center">
-                  Action
-                </th>
-              </tr>
-            </thead>
+      <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-slate-50 border-b border-slate-200">
+              <th className="px-6 py-4 text-sm font-semibold text-slate-700">
+                S.No.
+              </th>
+              <th className="px-6 py-4 text-sm font-semibold text-slate-700">
+                User Name
+              </th>
+              <th className="px-6 py-4 text-sm font-semibold text-slate-700 max-sm:hidden">
+                Job Title
+              </th>
+              <th className="px-6 py-4 text-sm font-semibold text-slate-700 max-sm:hidden">
+                Location
+              </th>
+              <th className="px-6 py-4 text-sm font-semibold text-slate-700">
+                Resume
+              </th>
+              <th className="px-6 py-4 text-sm font-semibold text-slate-700 text-center">
+                Action
+              </th>
+            </tr>
+          </thead>
+        </table>
 
+        <div className="max-h-[70vh] overflow-y-auto">
+          <table className="w-full text-left">
             <tbody className="divide-y divide-slate-100">
               {viewApplicationsPageData.map((applicant, index) => (
                 <tr
@@ -86,8 +88,7 @@ function ViewApplications() {
                     </a>
                   </td>
 
-                  {/* ACTION MENU */}
-                  <td className="px-6 py-4 text-center overflow-visible">
+                  <td className="px-6 py-4 text-center">
                     <div className="relative inline-block group/action">
                       <button
                         className="p-2 rounded-full text-slate-400

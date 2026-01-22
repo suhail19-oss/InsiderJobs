@@ -126,8 +126,8 @@ function AddJob() {
             </div>
           </div>
 
-          <div className="flex justify-end pt-6">
-            <button className="rounded-lg bg-blue-600 px-8 py-3 text-md font-bold text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 cursor-pointer">
+          <div className="flex justify-end pt-3">
+            <button className="bg-slate-900 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 transition-all shadow-sm active:scale-95 cursor-pointer">
               Post Job
             </button>
           </div>

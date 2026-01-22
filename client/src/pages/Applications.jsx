@@ -33,6 +33,7 @@ function Applications() {
                   </span>
                   <input
                     id="resumeUpload"
+                    value={resume}
                     onChange={(e) => setResume(e.target.files[0])}
                     accept="application/pdf"
                     type="file"
@@ -94,7 +95,7 @@ function Applications() {
                         {index + 1}.
                       </td>
 
-                      <td className="px-4 py-4 flex items-center gap-3  text-slate-700">
+                      <td className="px-4 py-4 flex items-center gap-3 font-medium text-slate-800">
                         <img
                           src={job.logo}
                           alt=""
