@@ -94,7 +94,22 @@ export const loginCompany = async (req, res) => {
   }
 };
 
-export const getCompanyData = async (req, res) => {};
+export const getCompanyData = async (req, res) => {
+  const company = req.company;
+
+  try {
+    res.status(200).json({
+      success: true,
+      company,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const postJob = async (req, res) => {
   const { title, description, location, salary, category, level } = req.body;
 
@@ -134,6 +149,60 @@ export const postJob = async (req, res) => {
 };
 
 export const getCompanyJobApplicants = async (req, res) => {};
-export const getCompanyPostedJobs = async (req, res) => {};
+
+export const getCompanyPostedJobs = async (req, res) => {
+  try {
+    const companyId = req.company._id;
+
+    const jobs = await Job.find({ companyId });
+
+    res.status(200).json({
+      success: true,
+      jobsData: jobs,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const changeJobApplicationStatus = async (req, res) => {};
-export const changeVisibility = async (res, req) => {};
+
+export const changeVisibility = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const companyId = req.company._id;
+
+    const job = await Job.findById(id);
+
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        message: "Job Not Found",
+      });
+    }
+
+    if (companyId.toString() !== job.companyId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Not Authorized",
+      });
+    }
+
+    job.visible = !job.visible;
+
+    await job.save();
+
+    res.status(200).json({
+      success: true,
+      job,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
