@@ -7,6 +7,7 @@ import * as Sentry from "@sentry/node";
 import { clerkWebHooks } from "./controllers/webhooks.js";
 import companyRoutes from "./routes/companyroutes.js";
 import connectCloudinary from "./config/cloudinary.js";
+import jobRoutes from "./routes/jobroutes.js";
 
 const app = express();
 await connectDB();
@@ -20,6 +21,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => res.send("API Working"));
 app.use("/api/company", companyRoutes);
+app.use("/api/jobs", jobRoutes);
 app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
