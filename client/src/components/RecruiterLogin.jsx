@@ -62,6 +62,7 @@ function RecruiterLogin({ onClose }) {
               />
               <input
                 onChange={(e) => setName(e.target.value)}
+                value={name}
                 type="text"
                 placeholder="Company Name"
                 required
@@ -80,6 +81,7 @@ function RecruiterLogin({ onClose }) {
                 />
                 <input
                   onChange={(e) => setEmail(e.target.value)}
+                  value={email}
                   type="email"
                   placeholder="Email ID"
                   required
@@ -95,6 +97,7 @@ function RecruiterLogin({ onClose }) {
                 />
                 <input
                   onChange={(e) => setPassword(e.target.value)}
+                  value={password}
                   type="password"
                   placeholder="Password"
                   required

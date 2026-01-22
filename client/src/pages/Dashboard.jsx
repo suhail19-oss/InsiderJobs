@@ -34,10 +34,12 @@ function Dashboard() {
             <div className="absolute right-0 top-full z-50 hidden group-hover:block pt-2">
               <button
                 onClick={() => alert("Logout clicked")}
-                className="flex items-center gap-2 px-5 py-3 text-sm text-red-600 bg-white border rounded-lg shadow hover:bg-red-50 w-full"
+                className="group/logout flex w-full cursor-pointer items-center gap-2 rounded-lg border-1 border-slate-200 bg-white px-5 py-3 text-sm transition-all hover:border-red-200 hover:bg-red-50 shadow-sm"
               >
-                <LogOut className="h-4 w-4" />
-                Logout
+                <LogOut className="h-4 w-4 text-slate-500 transition-colors group-hover/logout:text-red-600" />
+                <span className="font-medium text-slate-600 transition-colors group-hover/logout:text-red-600">
+                  Logout
+                </span>
               </button>
             </div>
           </div>

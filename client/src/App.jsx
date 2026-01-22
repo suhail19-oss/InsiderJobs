@@ -11,6 +11,7 @@ import ViewApplications from "./pages/ViewApplications";
 import AddJob from "./pages/AddJob";
 import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
+import "quill/dist/quill.snow.css";
 
 function App() {
   const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);
