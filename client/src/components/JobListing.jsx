@@ -70,6 +70,7 @@ function JobListing() {
       );
     setFilteredJobs(newFilteredJobs);
   }, [jobs, selectedCategories, selectedLocations, searchFilter]);
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="container mx-auto 2xl:px-20 px-4 pb-10">
@@ -141,7 +142,7 @@ function JobListing() {
 
                 <button
                   onClick={() => setShowFilter((prev) => !prev)}
-                  className="mb-6 px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium lg:hidden"
+                  className="mb-6 px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium lg:hidden cursor-pointer"
                 >
                   {showFilter ? "Close" : "Filters"}
                 </button>

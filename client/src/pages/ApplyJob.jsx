@@ -1,31 +1,88 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
 import Loading from "../components/Loading.jsx";
-import Navbar from "../components/Navbar.jsx";
 import { assets, JobCategories } from "../assets/assets.js";
-import kconvert from "k-convert";
 import moment from "moment";
 import JobCard from "../components/JobCard.jsx";
 import Footer from "../components/Footer.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useAuth } from "@clerk/clerk-react";
 
 function ApplyJob() {
   const { id } = useParams();
   const [JobData, setJobData] = useState(null);
-  const { jobs } = useContext(AppContext);
+  const [applied, setApplied] = useState(false);
+  const { jobs, backendUrl, userData, userApplications } =
+    useContext(AppContext);
+  const navigate = useNavigate();
+  const { getToken } = useAuth();
 
   const fetchJob = async () => {
-    const data = jobs.filter((job) => job._id === id);
-    if (data.length !== 0) {
-      setJobData(data[0]);
+    try {
+      const { data } = await axios.get(backendUrl + `/api/jobs/${id}`);
+
+      if (data.success) {
+        setJobData(data.job);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to fetch Job Details",
+      );
     }
   };
 
   useEffect(() => {
-    if (jobs.length > 0) {
-      fetchJob();
+    fetchJob();
+  }, [id]);
+
+  const applyHandler = async () => {
+    try {
+      if (!userData) {
+        toast.error("Login first to apply for Jobs.");
+        return;
+      }
+
+      if (!userData.resume) {
+        toast.error("Upload your resume to apply for Jobs.");
+        navigate("/applications");
+        return;
+      }
+
+      const token = await getToken();
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/apply",
+        { jobId: JobData._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        toast.success(data.message || "Applied Successfully 🎉");
+        setApplied(true);
+      } else {
+        toast.error(data.message || "Failed to apply for Job");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     }
-  }, [id, jobs]);
+  };
+
+  const formatCTC = (salary) => {
+    if (!salary) return "0k";
+    const value = (salary / 1000).toFixed(2);
+    return `${parseFloat(value)}k`;
+  };
 
   return JobData ? (
     <>
@@ -35,7 +92,7 @@ function ApplyJob() {
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 px-8 py-10 bg-slate-100">
               <div className="flex items-start gap-6">
                 <img
-                  className="h-20 w-20 bg-white rounded-xl p-3 border object-contain"
+                  className="h-20 w-20 bg-white rounded-xl p-3 border border-slate-300 object-contain"
                   src={JobData.companyId.image}
                   alt=""
                 />
@@ -60,16 +117,30 @@ function ApplyJob() {
                     </span>
                     <span className="flex items-center gap-1 font-medium">
                       <img src={assets.money_icon} alt="" />
-                      {kconvert.convertTo(JobData.salary)} CTC
+                      {formatCTC(JobData.salary)} CTC
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col items-center justify-center gap-2 min-w-[180px] self-center">
-                <button className="cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-3 rounded-lg font-semibold transition-all hover:shadow-md active:scale-95">
-                  Apply Now
+                <button
+                  onClick={applyHandler}
+                  disabled={applied}
+                  className="
+    px-12 py-3 rounded-lg font-semibold transition-all
+    bg-indigo-600 text-white hover:bg-indigo-700
+    active:scale-95
+
+    disabled:bg-slate-300
+    disabled:text-slate-500
+    disabled:cursor-not-allowed
+    disabled:active:scale-100 cursor-pointer
+  "
+                >
+                  {applied ? "Already Applied" : "Apply Now"}
                 </button>
+
                 <p className="text-sm text-slate-600">
                   Posted {moment(JobData.date).fromNow()}
                 </p>
@@ -104,8 +175,21 @@ function ApplyJob() {
                 dangerouslySetInnerHTML={{ __html: JobData.description }}
               />
 
-              <button className="mt-10 cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-3 rounded-lg font-semibold transition-all hover:shadow-md active:scale-95">
-                Apply Now
+              <button
+                onClick={applyHandler}
+                disabled={applied}
+                className="
+    mt-10 px-12 py-3 rounded-lg font-semibold transition-all
+    bg-indigo-600 text-white hover:bg-indigo-700
+    active:scale-95
+
+    disabled:bg-slate-300
+    disabled:text-slate-500
+    disabled:cursor-not-allowed
+    disabled:active:scale-100 cursor-pointer
+  "
+              >
+                {applied ? "Already Applied" : "Apply Now"}
               </button>
             </div>
 

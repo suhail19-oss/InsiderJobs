@@ -1,12 +1,48 @@
-import { useState } from "react";
-import Navbar from "../components/Navbar.jsx";
+import { useContext, useState } from "react";
 import { assets, jobsApplied } from "../assets/assets.js";
 import moment from "moment";
 import Footer from "../components/Footer.jsx";
+import { AppContext } from "../context/AppContext.jsx";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function Applications() {
+  const { user } = useUser();
+  const { getToken } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
   const [resume, setResume] = useState(null);
+  const { backendUrl, userData, userApplications, fetchUserData } =
+    useContext(AppContext);
+  const updateResume = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("resume", resume);
+
+      const token = await getToken();
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/update-resume",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        toast.success(data.message || "Resume updated successfully");
+        await fetchUserData();
+        setIsEdit(false);
+        setResume(null);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update resume");
+    }
+  };
 
   return (
     <>
@@ -17,7 +53,7 @@ function Applications() {
               Your Resume
             </h2>
 
-            {isEdit ? (
+            {isEdit || (userData && userData.resume === "") ? (
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <label
                   htmlFor="resumeUpload"
@@ -29,11 +65,10 @@ function Applications() {
                     className="h-6 w-6"
                   />
                   <span className="text-sm font-medium text-slate-700">
-                    Select Resume (PDF)
+                    {resume ? resume.name : "Select Resume (PDF)"}
                   </span>
                   <input
                     id="resumeUpload"
-                    value={resume}
                     onChange={(e) => setResume(e.target.files[0])}
                     accept="application/pdf"
                     type="file"
@@ -42,8 +77,16 @@ function Applications() {
                 </label>
 
                 <button
-                  onClick={() => setIsEdit(false)}
-                  className="px-6 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all active:scale-95 cursor-pointer"
+                  onClick={updateResume}
+                  disabled={!resume}
+                  className="
+    px-6 py-2 rounded-xl font-semibold transition-all
+    active:scale-95
+
+    bg-indigo-600 text-white hover:bg-indigo-700
+    disabled:bg-slate-300 disabled:text-slate-500
+    disabled:cursor-not-allowed disabled:active:scale-100 cursor-pointer
+  "
                 >
                   Save
                 </button>
@@ -51,7 +94,9 @@ function Applications() {
             ) : (
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
-                  href=""
+                  href={userData?.resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border border-slate-300 bg-indigo-50 text-indigo-700 font-medium hover:bg-indigo-100 transition"
                 >
                   View Resume

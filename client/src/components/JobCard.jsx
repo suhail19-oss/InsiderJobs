@@ -1,4 +1,3 @@
-import { assets } from "../assets/assets.js";
 import { useNavigate } from "react-router-dom";
 
 function JobCard({ job }) {
@@ -7,7 +6,7 @@ function JobCard({ job }) {
     <div className="group bg-white border border-slate-300 rounded-lg p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-blue-300 flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <img
-          src={assets.company_icon}
+          src={job.companyId.image}
           alt=""
           className="w-12 h-12 object-contain"
         />
