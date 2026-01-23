@@ -1,9 +1,59 @@
-import { manageJobsData } from "../assets/assets";
 import moment from "moment";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function ManageJobs() {
   const navigate = useNavigate();
+  const [jobs, setJobs] = useState([]);
+  const { backendUrl, companyToken } = useContext(AppContext);
+
+  const fetchCompanyJobs = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/company/list-jobs", {
+        headers: { token: companyToken },
+      });
+
+      if (data.success) {
+        setJobs([...data.jobsData].reverse());
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to fetch Jobs");
+    }
+  };
+
+  useEffect(() => {
+    if (companyToken) {
+      fetchCompanyJobs();
+    }
+  }, [companyToken]);
+
+  const changeVisibility = async (id) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/company/change-visibility",
+        { id },
+        { headers: { token: companyToken } },
+      );
+
+      if (data.success) {
+        toast.success(data.message || "Visibility Updated Successfully");
+        fetchCompanyJobs();
+      } else {
+        toast.error(data.message || "Failed to Update Visibility");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while Updating Visibility",
+      );
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 pt-8 md:px-10">
       <style>{`
@@ -43,14 +93,15 @@ function ManageJobs() {
                 </th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-slate-100">
-              {manageJobsData.map((job, index) => (
+              {jobs.map((job, index) => (
                 <tr
                   key={index}
                   className="hover:bg-slate-50/50 transition-colors"
                 >
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {index + 1}
+                  <td className="px-9 py-4 text-sm text-slate-600">
+                    {index + 1}.
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-slate-800 whitespace-nowrap">
                     {job.title}
@@ -68,8 +119,10 @@ function ManageJobs() {
                   </td>
                   <td className="px-6 py-4 text-center">
                     <input
+                      onChange={() => changeVisibility(job._id)}
                       type="checkbox"
                       className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                      checked={job.visible}
                     />
                   </td>
                 </tr>

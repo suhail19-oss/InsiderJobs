@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import Company from "../models/company.js";
 import generateToken from "../utils/generatetoken.js";
 import Job from "../models/job.js";
+import JobApplication from "../models/jobapplication.js";
 
 export const registerCompany = async (req, res) => {
   const { name, email, password } = req.body;
@@ -156,9 +157,34 @@ export const getCompanyPostedJobs = async (req, res) => {
 
     const jobs = await Job.find({ companyId });
 
+    if (jobs.length === 0) {
+      return res.status(200).json({
+        success: true,
+        jobsData: [],
+      });
+    }
+
+    const jobIds = jobs.map((job) => job._id);
+
+    const applications = await JobApplication.find({
+      jobId: { $in: jobIds },
+    });
+
+    const applicantCountMap = {};
+
+    applications.forEach((app) => {
+      const id = app.jobId.toString();
+      applicantCountMap[id] = (applicantCountMap[id] || 0) + 1;
+    });
+
+    const jobsData = jobs.map((job) => ({
+      ...job.toObject(),
+      applicants: applicantCountMap[job._id.toString()] || 0,
+    }));
+
     res.status(200).json({
       success: true,
-      jobsData: jobs,
+      jobsData,
     });
   } catch (error) {
     res.status(500).json({

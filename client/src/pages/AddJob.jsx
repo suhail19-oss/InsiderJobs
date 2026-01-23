@@ -1,16 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { JobCategories, JobLocations } from "../assets/assets.js";
+import { AppContext } from "../context/AppContext.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function AddJob() {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("Bangalore");
   const [category, setCategory] = useState("Programming");
   const [level, setLevel] = useState("Beginner Level");
-  const [salary, setSalary] = useState(0);
+  const [salary, setSalary] = useState("");
   const editorRef = useRef(null);
   const quillRef = useRef(null);
+  const { backendUrl, companyToken } = useContext(AppContext);
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -22,9 +26,50 @@ function AddJob() {
     }
   }, []);
 
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      const description = quillRef.current.root.innerHTML;
+
+      const { data } = await axios.post(
+        backendUrl + "/api/company/post-job",
+        {
+          title,
+          description,
+          location,
+          salary,
+          category,
+          level,
+        },
+        {
+          headers: { token: companyToken },
+        },
+      );
+
+      if (data.success) {
+        toast.success(data.message || "Job Added Successfully 🎉");
+
+        setTitle("");
+        setSalary(0);
+        quillRef.current.root.innerHTML = "";
+      } else {
+        toast.error(data.message || "Failed to Add Job");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while Adding the Job",
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-10">
-      <form className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-12">
+      <form
+        onSubmit={onSubmitHandler}
+        className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-12"
+      >
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-slate-900">Create Job Post</h1>
           <p className="mt-2 text-slate-500">
@@ -116,11 +161,18 @@ function AddJob() {
                 Annual Salary
               </label>
               <input
-                onChange={(e) => setSalary(Number(e.target.value))}
                 type="number"
-                value={salary}
-                placeholder="0"
                 min={0}
+                placeholder="0"
+                value={salary}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setSalary("");
+                  } else {
+                    setSalary(Math.max(0, Number(value)));
+                  }
+                }}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
               />
             </div>

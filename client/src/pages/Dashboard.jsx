@@ -1,11 +1,23 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { LogOut, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 function Dashboard() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const { companyData, setCompanyData, setCompanyToken } =
+    useContext(AppContext);
+
+  const logOut = () => {
+    setCompanyToken("");
+    setCompanyData(null);
+    localStorage.removeItem("companyToken");
+    toast.success("Logged Out Successfully 👋");
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -17,32 +29,35 @@ function Dashboard() {
             alt="Logo"
             className="h-8 sm:h-9 cursor-pointer"
           />
+          {companyData && (
+            <div className="relative group">
+              <div className="flex items-center gap-2 cursor-pointer">
+                <p className="text-sm text-slate-700">
+                  Welcome,{" "}
+                  <span className="font-semibold text-slate-800">
+                    {companyData.name}
+                  </span>
+                </p>
+                <img
+                  src={companyData.image}
+                  alt=""
+                  className="h-7 w-7 rounded-lg bg-white object-contain"
+                />
+              </div>
 
-          <div className="relative group">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <p className="text-sm text-slate-700">
-                Welcome,{" "}
-                <span className="font-semibold text-slate-800">Suhail</span>
-              </p>
-              <img
-                src={assets.company_icon}
-                alt=""
-                className="h-7 w-7 rounded-lg bg-white object-contain"
-              />
+              <div className="absolute right-0 top-full z-50 hidden group-hover:block pt-2">
+                <button className="group/logout flex w-full cursor-pointer items-center gap-2 rounded-lg border-1 border-slate-200 bg-white px-5 py-3 text-sm transition-all hover:border-red-200 hover:bg-red-50 shadow-sm">
+                  <LogOut className="h-4 w-4 text-slate-500 transition-colors group-hover/logout:text-red-600" />
+                  <span
+                    onClick={logOut}
+                    className="font-medium text-slate-600 transition-colors group-hover/logout:text-red-600"
+                  >
+                    Logout
+                  </span>
+                </button>
+              </div>
             </div>
-
-            <div className="absolute right-0 top-full z-50 hidden group-hover:block pt-2">
-              <button
-                onClick={() => alert("Logout clicked")}
-                className="group/logout flex w-full cursor-pointer items-center gap-2 rounded-lg border-1 border-slate-200 bg-white px-5 py-3 text-sm transition-all hover:border-red-200 hover:bg-red-50 shadow-sm"
-              >
-                <LogOut className="h-4 w-4 text-slate-500 transition-colors group-hover/logout:text-red-600" />
-                <span className="font-medium text-slate-600 transition-colors group-hover/logout:text-red-600">
-                  Logout
-                </span>
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </header>
 
