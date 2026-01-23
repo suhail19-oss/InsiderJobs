@@ -2,8 +2,8 @@ import { assets } from "../assets/assets.js";
 
 function Footer() {
   return (
-    <footer className="bg-white border-t border-slate-200 mt-20">
-      <div className="container mx-auto 2xl:px-20 px-6 py-4">
+    <footer className="bg-white border-t border-slate-200 mt-15">
+      <div className="container mx-auto 2xl:px-20 px-6 py-3">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center sm:items-start gap-2">
             <img src={assets.logo} alt="" className="h-8" />

@@ -30,7 +30,6 @@ export const AppContextProvider = (props) => {
 
       if (data.success) {
         setUserData(data.user);
-        console.log(data);
       } else {
         toast.error(data.message || "Failed to fetch User Data.");
       }
@@ -42,9 +41,33 @@ export const AppContextProvider = (props) => {
     }
   };
 
+  const fetchUserApplications = async () => {
+    try {
+      const token = await getToken();
+
+      const { data } = await axios.get(backendUrl + "/api/user/applications", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (data.success) {
+        setUserApplications(data.applications);
+      } else {
+        toast.error(data.message || "Failed to fetch applications");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching applications",
+      );
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchUserData();
+      fetchUserApplications();
     }
   }, [user]);
 
@@ -91,6 +114,7 @@ export const AppContextProvider = (props) => {
       setCompanyToken(storedCompanyToken);
     }
   }, []);
+
   useEffect(() => {
     if (companyToken) {
       fetchCompanyData();
@@ -116,6 +140,7 @@ export const AppContextProvider = (props) => {
     userApplications,
     setUserApplications,
     fetchUserData,
+    fetchUserApplications,
   };
 
   return (

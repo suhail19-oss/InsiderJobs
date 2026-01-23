@@ -60,7 +60,7 @@ export const applyForJob = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Applied Successfully",
+      message: "Applied Successfully 🎉",
     });
   } catch (error) {
     res.status(500).json({

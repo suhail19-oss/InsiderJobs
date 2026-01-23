@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
 
 function RecruiterLogin({ onClose }) {
-  const [state, setState] = useState("SignUp");
+  const [state, setState] = useState("Login");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");

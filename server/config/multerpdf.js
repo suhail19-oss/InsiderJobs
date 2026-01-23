@@ -10,7 +10,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
+const uploadPDF = multer({
   storage,
   fileFilter,
   limits: {
@@ -18,4 +18,4 @@ const upload = multer({
   },
 });
 
-export default upload;
+export default uploadPDF;

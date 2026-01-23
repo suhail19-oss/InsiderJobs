@@ -149,7 +149,35 @@ export const postJob = async (req, res) => {
   }
 };
 
-export const getCompanyJobApplicants = async (req, res) => {};
+export const getCompanyJobApplicants = async (req, res) => {
+  try {
+    const companyId = req.company?._id;
+
+    if (!companyId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized Access. Company not found.",
+      });
+    }
+
+    const applications = await JobApplication.find({ companyId })
+      .populate("userId", "name image resume")
+      .populate("jobId", "title location category level salary")
+      .exec();
+
+    return res.status(200).json({
+      success: true,
+      applications,
+    });
+  } catch (error) {
+    console.error("Error fetching Company Job Applicants:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch Job Applicants. Please try again later.",
+    });
+  }
+};
 
 export const getCompanyPostedJobs = async (req, res) => {
   try {
@@ -194,7 +222,44 @@ export const getCompanyPostedJobs = async (req, res) => {
   }
 };
 
-export const changeJobApplicationStatus = async (req, res) => {};
+export const changeJobApplicationStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+
+    if (!id || !status) {
+      return res.status(400).json({
+        success: false,
+        message: "Application id and Status are required",
+      });
+    }
+
+    const updatedApplication = await JobApplication.findOneAndUpdate(
+      { _id: id },
+      { status },
+      { new: true },
+    );
+
+    if (!updatedApplication) {
+      return res.status(404).json({
+        success: false,
+        message: "Job Application not Found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Status Changed Successfully",
+      application: updatedApplication,
+    });
+  } catch (error) {
+    console.error("Error updating Job Application Status:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to Update Application Status",
+    });
+  }
+};
 
 export const changeVisibility = async (req, res) => {
   try {

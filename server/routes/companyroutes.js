@@ -9,12 +9,12 @@ import {
   changeJobApplicationStatus,
   changeVisibility,
 } from "../controllers/companycontroller.js";
-import upload from "../config/multer.js";
 import { protectCompany } from "../middlewares/authmiddleware.js";
+import uploadImage from "../config/multerimage.js";
 
 const router = express.Router();
 
-router.post("/register", upload.single("image"), registerCompany);
+router.post("/register", uploadImage.single("image"), registerCompany);
 router.post("/login", loginCompany);
 router.get("/company", protectCompany, getCompanyData);
 router.post("/post-job", protectCompany, postJob);

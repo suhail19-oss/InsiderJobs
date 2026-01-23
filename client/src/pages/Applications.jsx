@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { assets, jobsApplied } from "../assets/assets.js";
 import moment from "moment";
 import Footer from "../components/Footer.jsx";
@@ -12,8 +12,14 @@ function Applications() {
   const { getToken } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
   const [resume, setResume] = useState(null);
-  const { backendUrl, userData, userApplications, fetchUserData } =
-    useContext(AppContext);
+  const {
+    backendUrl,
+    userData,
+    userApplications,
+    fetchUserData,
+    fetchUserApplications,
+  } = useContext(AppContext);
+
   const updateResume = async () => {
     try {
       const formData = new FormData();
@@ -42,6 +48,31 @@ function Applications() {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update resume");
     }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchUserApplications();
+    }
+  }, [user]);
+
+  const statusUI = {
+    Pending: {
+      label: "Under Review",
+      className: "bg-yellow-100 text-yellow-600",
+    },
+    Accepted: {
+      label: "Interview Scheduled",
+      className: "bg-indigo-50 text-indigo-700",
+    },
+    "Interview Scheduled": {
+      label: "Interview Scheduled",
+      className: "bg-indigo-50 text-indigo-700",
+    },
+    "Application Closed": {
+      label: "Rejected",
+      className: "bg-red-100 text-red-700",
+    },
   };
 
   return (
@@ -131,7 +162,7 @@ function Applications() {
                 </thead>
 
                 <tbody>
-                  {jobsApplied.map((job, index) => (
+                  {userApplications.map((job, index) => (
                     <tr
                       key={index}
                       className="border-t border-slate-200 text-sm hover:bg-slate-50 transition"
@@ -142,35 +173,31 @@ function Applications() {
 
                       <td className="px-4 py-4 flex items-center gap-3 font-medium text-slate-800">
                         <img
-                          src={job.logo}
+                          src={job.companyId.image}
                           alt=""
                           className="h-8 w-8 rounded-md object-contain bg-white"
                         />
-                        {job.company}
+                        {job.companyId.name}
                       </td>
-
-                      <td className="px-4 py-4 text-slate-700">{job.title}</td>
 
                       <td className="px-4 py-4 text-slate-700">
-                        {job.location}
+                        {job.jobId.title}
                       </td>
 
-                      <td className="px-4 py-4 text-slate-600">
+                      <td className="px-4 py-4 text-slate-700">
+                        {job.jobId.location}
+                      </td>
+
+                      <td className="px-4 py-4 text-slate-700">
                         {moment(job.date).format("ll")}
                       </td>
 
                       <td className="px-4 py-4">
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                            ${
-                              job.status === "Accepted"
-                                ? "bg-green-100 text-green-700"
-                                : job.status === "Rejected"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-yellow-100 text-yellow-700"
-                            }`}
+      ${statusUI[job.status]?.className || "bg-slate-100 text-slate-600"}`}
                         >
-                          {job.status}
+                          {statusUI[job.status]?.label || job.status}
                         </span>
                       </td>
                     </tr>

@@ -119,7 +119,7 @@ function Dashboard() {
           </ul>
         </aside>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 h-full p-2 sm:p-5">
           <Outlet />
         </main>
       </div>

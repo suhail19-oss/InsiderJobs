@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
 import Loading from "../components/Loading.jsx";
-import { assets, JobCategories } from "../assets/assets.js";
+import { assets } from "../assets/assets.js";
 import moment from "moment";
 import JobCard from "../components/JobCard.jsx";
 import Footer from "../components/Footer.jsx";
@@ -13,9 +13,14 @@ import { useAuth } from "@clerk/clerk-react";
 function ApplyJob() {
   const { id } = useParams();
   const [JobData, setJobData] = useState(null);
-  const [applied, setApplied] = useState(false);
-  const { jobs, backendUrl, userData, userApplications } =
-    useContext(AppContext);
+  const [isApplied, setIsApplied] = useState(false);
+  const {
+    jobs,
+    backendUrl,
+    userData,
+    userApplications,
+    fetchUserApplications,
+  } = useContext(AppContext);
   const navigate = useNavigate();
   const { getToken } = useAuth();
 
@@ -66,7 +71,7 @@ function ApplyJob() {
 
       if (data.success) {
         toast.success(data.message || "Applied Successfully 🎉");
-        setApplied(true);
+        fetchUserApplications();
       } else {
         toast.error(data.message || "Failed to apply for Job");
       }
@@ -78,11 +83,29 @@ function ApplyJob() {
     }
   };
 
+  useEffect(() => {
+    if (!JobData?._id) return;
+
+    const hasApplied = userApplications.some(
+      (item) => item.jobId?._id === JobData._id,
+    );
+
+    setIsApplied(hasApplied);
+  }, [JobData, userApplications]);
+
   const formatCTC = (salary) => {
     if (!salary) return "0k";
     const value = (salary / 1000).toFixed(2);
     return `${parseFloat(value)}k`;
   };
+
+  const remainingCompanyJobs = jobs
+    .filter(
+      (job) =>
+        job.companyId?._id === JobData?.companyId?._id &&
+        !userApplications.some((app) => app.jobId?._id === job._id),
+    )
+    .slice(0, 4);
 
   return JobData ? (
     <>
@@ -126,7 +149,7 @@ function ApplyJob() {
               <div className="flex flex-col items-center justify-center gap-2 min-w-[180px] self-center">
                 <button
                   onClick={applyHandler}
-                  disabled={applied}
+                  disabled={isApplied}
                   className="
     px-12 py-3 rounded-lg font-semibold transition-all
     bg-indigo-600 text-white hover:bg-indigo-700
@@ -138,7 +161,7 @@ function ApplyJob() {
     disabled:active:scale-100 cursor-pointer
   "
                 >
-                  {applied ? "Already Applied" : "Apply Now"}
+                  {isApplied ? "Already Applied" : "Apply Now"}
                 </button>
 
                 <p className="text-sm text-slate-600">
@@ -177,7 +200,7 @@ function ApplyJob() {
 
               <button
                 onClick={applyHandler}
-                disabled={applied}
+                disabled={isApplied}
                 className="
     mt-10 px-12 py-3 rounded-lg font-semibold transition-all
     bg-indigo-600 text-white hover:bg-indigo-700
@@ -189,7 +212,7 @@ function ApplyJob() {
     disabled:active:scale-100 cursor-pointer
   "
               >
-                {applied ? "Already Applied" : "Apply Now"}
+                {isApplied ? "Already Applied" : "Apply Now"}
               </button>
             </div>
 
@@ -198,16 +221,37 @@ function ApplyJob() {
                 More Jobs from {JobData.companyId.name}
               </h2>
 
-              {jobs
-                .filter(
-                  (job) =>
-                    job._id !== JobData._id &&
-                    job.companyId._id === JobData.companyId._id,
-                )
-                .slice(0, 4)
-                .map((job) => (
+              {remainingCompanyJobs.length > 0 ? (
+                remainingCompanyJobs.map((job) => (
                   <JobCard key={job._id} job={job} />
-                ))}
+                ))
+              ) : (
+                <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-none">
+                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-indigo-500" />
+
+                  <div className="flex flex-col items-center text-center gap-3">
+                    <div className="h-12 w-12 flex items-center justify-center rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 text-xl font-semibold">
+                      ✓
+                    </div>
+
+                    <p className="text-slate-800 font-semibold">
+                      You’re all Caught Up
+                    </p>
+
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      You’ve already applied to all available roles at{" "}
+                      <span className="font-medium text-slate-700">
+                        {JobData.companyId.name}
+                      </span>
+                      .
+                    </p>
+
+                    <p className="text-xs text-slate-600">
+                      New openings will show up here when they’re posted.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
