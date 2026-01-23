@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { ArrowRight } from "lucide-react";
+import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
 
 function RecruiterLogin({ onClose }) {
   const [state, setState] = useState("SignUp");
@@ -9,13 +14,76 @@ function RecruiterLogin({ onClose }) {
   const [email, setEmail] = useState("");
   const [image, setImage] = useState(false);
   const [isTextSubmiited, setIsTextSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { setShowRecruiterLogin, backendUrl, setCompanyToken, setCompanyData } =
+    useContext(AppContext);
+
+  const isPasswordValid = (password) => {
+    const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+    return regex.test(password);
+  };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     if (state === "SignUp" && !isTextSubmiited) {
+      if (!isPasswordValid(password)) {
+        toast.error(
+          "Password must be at least 8 characters long and include 1 number and 1 special character.",
+        );
+        return;
+      }
+
       setIsTextSubmitted(true);
       return;
+    }
+
+    try {
+      if (state === "Login") {
+        const { data } = await axios.post(backendUrl + "/api/company/login", {
+          email,
+          password,
+        });
+
+        if (data.success) {
+          toast.success("Login Successful! Welcome 👋");
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem("companyToken", data.token);
+          setShowRecruiterLogin(false);
+          navigate("/dashboard");
+        } else {
+          toast.error(data.message);
+        }
+      } else {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("password", password);
+        formData.append("email", email);
+        formData.append("image", image);
+
+        const { data } = await axios.post(
+          backendUrl + "/api/company/register",
+          formData,
+        );
+
+        if (data.success) {
+          toast.success("Account Created Successfully 🎉");
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem("companyToken", data.token);
+          setShowRecruiterLogin(false);
+          navigate("/dashboard");
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     }
   };
 
@@ -95,15 +163,31 @@ function RecruiterLogin({ onClose }) {
                   alt=""
                   className="h-5 w-5 opacity-70"
                 />
+
                 <input
                   onChange={(e) => setPassword(e.target.value)}
                   value={password}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   required
                   className="w-full outline-none text-sm text-slate-700 placeholder-slate-400"
                 />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-slate-500 hover:text-slate-700 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
+              {state === "SignUp" && !isTextSubmiited && (
+                <p className="text-xs text-slate-500 mt-1 ml-1">
+                  Password must be at least 8 characters long and include
+                  <span className="font-medium"> 1 number</span> and
+                  <span className="font-medium"> 1 special character</span>.
+                </p>
+              )}
             </>
           )}
 

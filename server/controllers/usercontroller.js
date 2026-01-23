@@ -1,6 +1,7 @@
 import JobApplication from "../models/jobapplication.js";
 import User from "../models/user.js";
 import Job from "../models/job.js";
+import { v2 as cloudinary } from "cloudinary";
 
 export const getUserData = async (req, res) => {
   const userId = req.auth.userId;
@@ -69,6 +70,67 @@ export const applyForJob = async (req, res) => {
   }
 };
 
-export const getUserJobApplications = async (req, res) => {};
+export const getUserJobApplications = async (req, res) => {
+  try {
+    const userId = req.auth.userId;
 
-export const updateUserResume = async (req, res) => {};
+    const applications = await JobApplication.find({ userId })
+      .populate("companyId", "name email image")
+      .populate("jobId", "title description location category level salary");
+
+    if (applications.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User has not Applied to any Jobs",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      applications,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateUserResume = async (req, res) => {
+  try {
+    const userId = req.auth.userId;
+    const resumeFile = req.file;
+
+    const userData = await User.findById(userId);
+
+    if (!userData) {
+      return res.status(404).json({
+        success: false,
+        message: "User Not Found",
+      });
+    }
+
+    if (!resumeFile) {
+      return res.status(400).json({
+        success: false,
+        message: "Resume File is Required",
+      });
+    }
+
+    const resumeUpload = await cloudinary.uploader.upload(resumeFile.path);
+    userData.resume = resumeUpload.secure_url;
+
+    await userData.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Resume Updated",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

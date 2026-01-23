@@ -12,12 +12,16 @@ import AddJob from "./pages/AddJob";
 import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
 import "quill/dist/quill.snow.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);
 
   return (
     <>
+      <ToastContainer position="bottom-right" autoClose={3000} />
+
       <div
         className={`transition-all duration-300 ${
           showRecruiterLogin ? "blur-sm pointer-events-none select-none" : ""

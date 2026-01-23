@@ -20,7 +20,7 @@ export const registerCompany = async (req, res) => {
     if (companyExists) {
       return res.status(409).json({
         success: false,
-        message: "Company Already Registered.",
+        message: "Company Already Registered",
       });
     }
 
@@ -63,7 +63,7 @@ export const loginCompany = async (req, res) => {
     if (!company) {
       return res.status(401).json({
         success: false,
-        message: "Invalid Email or Password.",
+        message: "Invalid Email or Password",
       });
     }
 
@@ -72,7 +72,7 @@ export const loginCompany = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid Email or Password.",
+        message: "Invalid Email or Password",
       });
     }
 

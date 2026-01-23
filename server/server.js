@@ -1,7 +1,7 @@
+import "dotenv/config";
 import "./config/instrument.js";
 import express from "express";
 import cors from "cors";
-import "dotenv/config";
 import connectDB from "./config/db.js";
 import * as Sentry from "@sentry/node";
 import { clerkWebHooks } from "./controllers/webhooks.js";
