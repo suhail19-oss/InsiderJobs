@@ -74,9 +74,13 @@ function Applications() {
     },
   };
 
-  const totalPages = Math.ceil(userApplications.length / JOBS_PER_PAGE);
+  const validApplications = userApplications.filter(
+    (job) => job.jobId && job.companyId,
+  );
 
-  const paginatedApplications = userApplications.slice(
+  const totalPages = Math.ceil(validApplications.length / JOBS_PER_PAGE);
+
+  const paginatedApplications = validApplications.slice(
     (currentPage - 1) * JOBS_PER_PAGE,
     currentPage * JOBS_PER_PAGE,
   );
@@ -165,7 +169,7 @@ function Applications() {
                 <tbody>
                   {paginatedApplications.map((job, index) => (
                     <tr
-                      key={index}
+                      key={job._id || index}
                       className="border-t border-slate-200 text-sm hover:bg-slate-50 transition"
                     >
                       <td className="px-7 py-4 text-slate-700">
@@ -174,24 +178,34 @@ function Applications() {
 
                       <td className="px-4 py-4 flex items-center gap-3 font-medium text-slate-800">
                         <img
-                          src={job.companyId.image}
+                          src={
+                            job.companyId?.image || assets.company_placeholder
+                          }
                           alt=""
                           className="h-8 w-8 rounded-md object-contain bg-white"
                         />
-                        {job.companyId.name}
+                        {job.companyId?.name || "Company removed"}
                       </td>
 
-                      <td className="px-4 py-4">{job.jobId.title}</td>
-                      <td className="px-4 py-4">{job.jobId.location}</td>
+                      <td className="px-4 py-4">
+                        {job.jobId?.title || "Job not available"}
+                      </td>
+
+                      <td className="px-4 py-4">
+                        {job.jobId?.location || "—"}
+                      </td>
+
                       <td className="px-4 py-4">
                         {moment(job.date).format("ll")}
                       </td>
 
                       <td className="px-4 py-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${statusUI[job.status]?.className}`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            statusUI[job.status]?.className || ""
+                          }`}
                         >
-                          {statusUI[job.status]?.label}
+                          {statusUI[job.status]?.label || job.status}
                         </span>
                       </td>
                     </tr>
