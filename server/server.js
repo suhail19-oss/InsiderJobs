@@ -16,17 +16,15 @@ const app = express();
 await connectDB();
 await connectCloudinary();
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://insiderjobs-client.onrender.com/",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "token"],
-    credentials: true,
-  }),
-);
+const corsOptions = {
+  origin: "https://insiderjobs-client.onrender.com",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "token"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
