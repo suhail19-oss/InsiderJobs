@@ -4,6 +4,7 @@ import Job from "../models/job.js";
 import { v2 as cloudinary } from "cloudinary";
 import { sendEmail } from "../utils/sendemail.js";
 import { appliedTemplate } from "../utils/emailtemplates.js";
+import Company from "../models/company.js";
 
 export const getUserData = async (req, res) => {
   const userId = req.auth().userId;
@@ -33,48 +34,59 @@ export const getUserData = async (req, res) => {
 export const applyForJob = async (req, res) => {
   const { jobId } = req.body;
   const userId = req.auth().userId;
-  const user = await User.findById(userId);
 
   try {
-    const isAlreadyApplied = await JobApplication.find({ jobId, userId });
+    const alreadyApplied = await JobApplication.exists({ jobId, userId });
 
-    if (isAlreadyApplied.length > 0) {
+    if (alreadyApplied) {
       return res.status(409).json({
         success: false,
         message: "Already Applied",
       });
     }
 
-    const jobData = await Job.findById(jobId);
-    await jobData.populate("companyId", "name");
+    const job = await Job.findById(jobId).select("title companyId");
 
-    if (!jobData) {
+    if (!job) {
       return res.status(404).json({
         success: false,
         message: "Job Not Found",
       });
     }
 
-    await JobApplication.create({
-      companyId: jobData.companyId,
+    const application = await JobApplication.create({
+      companyId: job.companyId,
       userId,
       jobId,
       date: Date.now(),
     });
 
-    await sendEmail({
-      to: user.email,
-      subject: "Application Submitted – InsiderJobs",
-      html: appliedTemplate({
-        name: user.name,
-        jobTitle: jobData.title,
-        company: jobData.companyId.name,
-      }),
-    });
-
     res.status(201).json({
       success: true,
       message: "Applied Successfully 🎉",
+    });
+
+    setImmediate(async () => {
+      try {
+        const [user, company] = await Promise.all([
+          User.findById(userId).select("name email"),
+          Company.findById(job.companyId).select("name"),
+        ]);
+
+        if (!user || !company) return;
+
+        await sendEmail({
+          to: user.email,
+          subject: "Application Submitted – InsiderJobs",
+          html: appliedTemplate({
+            name: user.name,
+            jobTitle: job.title,
+            company: company.name,
+          }),
+        });
+      } catch (err) {
+        console.error("Apply email failed:", err.message);
+      }
     });
   } catch (error) {
     res.status(500).json({

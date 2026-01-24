@@ -105,8 +105,6 @@ export const newJobPostedTemplate = ({
     Visit InsiderJobs now to apply before the position fills up.
   </p>
 
-  <br/>
-
   <p>
     Happy Job Hunting!!<br/>
     <b>Insider Jobs Team</b>

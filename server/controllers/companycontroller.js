@@ -156,9 +156,9 @@ export const postJob = async (req, res) => {
 
     const users = await User.find({}, "email");
 
-    users.forEach(async (user) => {
-      try {
-        await sendEmail({
+    await Promise.allSettled(
+      users.map((user) =>
+        sendEmail({
           to: user.email,
           subject: `New Job Posted: ${title}`,
           html: newJobPostedTemplate({
@@ -167,11 +167,9 @@ export const postJob = async (req, res) => {
             location,
             level,
           }),
-        });
-      } catch (err) {
-        console.error(`Email failed for ${user.email}:`, err.message);
-      }
-    });
+        }),
+      ),
+    );
 
     res.status(201).json({
       success: true,
@@ -265,7 +263,7 @@ export const changeJobApplicationStatus = async (req, res) => {
     if (!id || !status) {
       return res.status(400).json({
         success: false,
-        message: "Application id and Status are required",
+        message: "Application Id and Status are required",
       });
     }
 
@@ -282,31 +280,39 @@ export const changeJobApplicationStatus = async (req, res) => {
       });
     }
 
-    const updatedApplication = await JobApplication.findOneAndUpdate(
-      { _id: id },
+    const application = await JobApplication.findByIdAndUpdate(
+      id,
       { status },
       { new: true },
-    )
-      .populate("userId", "name email")
-      .populate("jobId", "title")
-      .populate("companyId", "name");
+    ).select("userId jobId companyId emailNotifiedFor");
 
-    if (!updatedApplication) {
+    if (!application) {
       return res.status(404).json({
         success: false,
         message: "Job Application not Found",
       });
     }
 
-    const user = updatedApplication.userId;
-    const job = updatedApplication.jobId;
-    const company = updatedApplication.companyId;
+    res.status(200).json({
+      success: true,
+      message: "Status Changed Successfully",
+    });
 
-    if (updatedApplication.emailNotifiedFor !== status) {
-      if (status === "Interview Scheduled") {
-        const { date, time } = getInterviewSchedule();
+    setImmediate(async () => {
+      try {
+        if (application.emailNotifiedFor === status) return;
 
-        try {
+        const [user, job, company] = await Promise.all([
+          User.findById(application.userId).select("name email"),
+          Job.findById(application.jobId).select("title"),
+          Company.findById(application.companyId).select("name"),
+        ]);
+
+        if (!user || !job || !company) return;
+
+        if (status === "Interview Scheduled") {
+          const { date, time } = getInterviewSchedule();
+
           await sendEmail({
             to: user.email,
             subject: "Interview Scheduled – InsiderJobs",
@@ -318,13 +324,9 @@ export const changeJobApplicationStatus = async (req, res) => {
               time,
             }),
           });
-        } catch (error) {
-          console.error("Interview email failed:", error.message);
         }
-      }
 
-      if (status === "Application Closed") {
-        try {
+        if (status === "Application Closed") {
           await sendEmail({
             to: user.email,
             subject: "Application Update – InsiderJobs",
@@ -334,22 +336,16 @@ export const changeJobApplicationStatus = async (req, res) => {
               company: company.name,
             }),
           });
-        } catch (error) {
-          console.error("Rejection email failed:", error.message);
         }
+
+        application.emailNotifiedFor = status;
+        await application.save();
+      } catch (err) {
+        console.error("Background email failed:", err.message);
       }
-
-      updatedApplication.emailNotifiedFor = status;
-      await updatedApplication.save();
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Status Changed Successfully",
     });
   } catch (error) {
     console.error("Error updating Job Application Status:", error);
-
     return res.status(500).json({
       success: false,
       message: "Failed to Update Application Status",
