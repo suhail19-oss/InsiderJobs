@@ -1,4 +1,4 @@
-import { use, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext.jsx";
 import Loading from "../components/Loading.jsx";
@@ -99,13 +99,18 @@ function ApplyJob() {
     return `${parseFloat(value)}k`;
   };
 
-  const remainingCompanyJobs = jobs
-    .filter(
-      (job) =>
-        job.companyId?._id === JobData?.companyId?._id &&
-        !userApplications.some((app) => app.jobId?._id === job._id),
-    )
-    .slice(0, 4);
+  const remainingCompanyJobs = [
+    ...new Map(
+      jobs
+        .filter(
+          (job) =>
+            job._id !== JobData?._id &&
+            job.companyId?._id === JobData?.companyId?._id &&
+            !userApplications.some((app) => app.jobId?._id === job._id),
+        )
+        .map((job) => [job._id, job]),
+    ).values(),
+  ].slice(0, 4);
 
   return JobData ? (
     <>

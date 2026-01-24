@@ -2,6 +2,8 @@ import JobApplication from "../models/jobapplication.js";
 import User from "../models/user.js";
 import Job from "../models/job.js";
 import { v2 as cloudinary } from "cloudinary";
+import { sendEmail } from "../utils/sendemail.js";
+import { appliedTemplate } from "../utils/emailtemplates.js";
 
 export const getUserData = async (req, res) => {
   const userId = req.auth().userId;
@@ -31,6 +33,7 @@ export const getUserData = async (req, res) => {
 export const applyForJob = async (req, res) => {
   const { jobId } = req.body;
   const userId = req.auth().userId;
+  const user = await User.findById(userId);
 
   try {
     const isAlreadyApplied = await JobApplication.find({ jobId, userId });
@@ -43,6 +46,7 @@ export const applyForJob = async (req, res) => {
     }
 
     const jobData = await Job.findById(jobId);
+    await jobData.populate("companyId", "name");
 
     if (!jobData) {
       return res.status(404).json({
@@ -56,6 +60,16 @@ export const applyForJob = async (req, res) => {
       userId,
       jobId,
       date: Date.now(),
+    });
+
+    await sendEmail({
+      to: user.email,
+      subject: "Application Submitted – InsiderJobs",
+      html: appliedTemplate({
+        name: user.name,
+        jobTitle: jobData.title,
+        company: jobData.companyId.name,
+      }),
     });
 
     res.status(201).json({

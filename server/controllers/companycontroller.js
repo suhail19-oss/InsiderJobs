@@ -4,6 +4,26 @@ import Company from "../models/company.js";
 import generateToken from "../utils/generatetoken.js";
 import Job from "../models/job.js";
 import JobApplication from "../models/jobapplication.js";
+import { sendEmail } from "../utils/sendemail.js";
+import User from "../models/user.js";
+import {
+  interviewTemplate,
+  rejectedTemplate,
+  newJobPostedTemplate,
+} from "../utils/emailtemplates.js";
+
+const getInterviewSchedule = () => {
+  const interviewDate = new Date();
+  interviewDate.setDate(interviewDate.getDate() + 7);
+
+  const hours = Math.floor(Math.random() * (17 - 10)) + 10;
+  const minutes = Math.random() > 0.5 ? "00" : "30";
+
+  return {
+    date: interviewDate.toDateString(),
+    time: `${hours}:${minutes}`,
+  };
+};
 
 export const registerCompany = async (req, res) => {
   const { name, email, password } = req.body;
@@ -113,7 +133,6 @@ export const getCompanyData = async (req, res) => {
 
 export const postJob = async (req, res) => {
   const { title, description, location, salary, category, level } = req.body;
-
   const companyId = req.company._id;
 
   if (!title || !description || !location || !salary || !category || !level) {
@@ -124,7 +143,7 @@ export const postJob = async (req, res) => {
   }
 
   try {
-    const newJob = new Job({
+    const newJob = await Job.create({
       title,
       description,
       location,
@@ -135,7 +154,24 @@ export const postJob = async (req, res) => {
       companyId,
     });
 
-    await newJob.save();
+    const users = await User.find({}, "email");
+
+    users.forEach(async (user) => {
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: `New Job Posted: ${title}`,
+          html: newJobPostedTemplate({
+            jobTitle: title,
+            company: req.company.name,
+            location,
+            level,
+          }),
+        });
+      } catch (err) {
+        console.error(`Email failed for ${user.email}:`, err.message);
+      }
+    });
 
     res.status(201).json({
       success: true,
@@ -233,11 +269,27 @@ export const changeJobApplicationStatus = async (req, res) => {
       });
     }
 
+    const allowedStatuses = [
+      "Pending",
+      "Interview Scheduled",
+      "Application Closed",
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Application Status",
+      });
+    }
+
     const updatedApplication = await JobApplication.findOneAndUpdate(
       { _id: id },
       { status },
       { new: true },
-    );
+    )
+      .populate("userId", "name email")
+      .populate("jobId", "title")
+      .populate("companyId", "name");
 
     if (!updatedApplication) {
       return res.status(404).json({
@@ -246,10 +298,54 @@ export const changeJobApplicationStatus = async (req, res) => {
       });
     }
 
+    const user = updatedApplication.userId;
+    const job = updatedApplication.jobId;
+    const company = updatedApplication.companyId;
+
+    if (updatedApplication.emailNotifiedFor !== status) {
+      if (status === "Interview Scheduled") {
+        const { date, time } = getInterviewSchedule();
+
+        try {
+          await sendEmail({
+            to: user.email,
+            subject: "Interview Scheduled – InsiderJobs",
+            html: interviewTemplate({
+              name: user.name,
+              jobTitle: job.title,
+              company: company.name,
+              date,
+              time,
+            }),
+          });
+        } catch (error) {
+          console.error("Interview email failed:", error.message);
+        }
+      }
+
+      if (status === "Application Closed") {
+        try {
+          await sendEmail({
+            to: user.email,
+            subject: "Application Update – InsiderJobs",
+            html: rejectedTemplate({
+              name: user.name,
+              jobTitle: job.title,
+              company: company.name,
+            }),
+          });
+        } catch (error) {
+          console.error("Rejection email failed:", error.message);
+        }
+      }
+
+      updatedApplication.emailNotifiedFor = status;
+      await updatedApplication.save();
+    }
+
     return res.status(200).json({
       success: true,
       message: "Status Changed Successfully",
-      application: updatedApplication,
     });
   } catch (error) {
     console.error("Error updating Job Application Status:", error);

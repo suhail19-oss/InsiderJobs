@@ -14,6 +14,10 @@ const JobApplicationSchema = new mongoose.Schema({
   },
   status: { type: String, default: "Pending" },
   date: { type: Number, required: true },
+  emailNotifiedFor: {
+    type: String,
+    default: null,
+  },
 });
 
 const JobApplication = mongoose.model("JobApplication", JobApplicationSchema);

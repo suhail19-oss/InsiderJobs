@@ -51,7 +51,7 @@ function AddJob() {
         toast.success(data.message || "Job Added Successfully 🎉");
 
         setTitle("");
-        setSalary(0);
+        setSalary("");
         quillRef.current.root.innerHTML = "";
       } else {
         toast.error(data.message || "Failed to Add Job");

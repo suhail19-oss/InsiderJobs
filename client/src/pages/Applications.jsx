@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { assets, jobsApplied } from "../assets/assets.js";
+import { assets } from "../assets/assets.js";
 import moment from "moment";
 import Footer from "../components/Footer.jsx";
 import { AppContext } from "../context/AppContext.jsx";
@@ -12,6 +12,10 @@ function Applications() {
   const { getToken } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
   const [resume, setResume] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const JOBS_PER_PAGE = 6;
+
   const {
     backendUrl,
     userData,
@@ -24,17 +28,12 @@ function Applications() {
     try {
       const formData = new FormData();
       formData.append("resume", resume);
-
       const token = await getToken();
 
       const { data } = await axios.post(
         backendUrl + "/api/user/update-resume",
         formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (data.success) {
@@ -75,10 +74,18 @@ function Applications() {
     },
   };
 
+  const totalPages = Math.ceil(userApplications.length / JOBS_PER_PAGE);
+
+  const paginatedApplications = userApplications.slice(
+    (currentPage - 1) * JOBS_PER_PAGE,
+    currentPage * JOBS_PER_PAGE,
+  );
+
   return (
     <>
       <div className="min-h-[65vh] bg-slate-50">
         <div className="mx-auto max-w-6xl px-4 2xl:px-20 py-10 space-y-10">
+          {/* Resume Section (unchanged) */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
             <h2 className="text-2xl font-semibold text-slate-800 mb-6 text-center">
               Your Resume
@@ -110,14 +117,7 @@ function Applications() {
                 <button
                   onClick={updateResume}
                   disabled={!resume}
-                  className="
-    px-6 py-2 rounded-xl font-semibold transition-all
-    active:scale-95
-
-    bg-indigo-600 text-white hover:bg-indigo-700
-    disabled:bg-slate-300 disabled:text-slate-500
-    disabled:cursor-not-allowed disabled:active:scale-100 cursor-pointer
-  "
+                  className="px-6 py-2 rounded-xl font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
                 >
                   Save
                 </button>
@@ -128,14 +128,14 @@ function Applications() {
                   href={userData?.resume}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border border-slate-300 bg-indigo-50 text-indigo-700 font-medium hover:bg-indigo-100 transition"
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border bg-indigo-50 text-indigo-700 font-medium hover:bg-indigo-100 transition"
                 >
                   View Resume
                 </a>
 
                 <button
                   onClick={() => setIsEdit(true)}
-                  className="px-5 py-2 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-100 transition cursor-pointer"
+                  className="px-5 py-2 rounded-xl border text-slate-600 hover:bg-slate-100 transition"
                 >
                   Edit
                 </button>
@@ -143,6 +143,7 @@ function Applications() {
             )}
           </div>
 
+          {/* Jobs Applied */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
             <h2 className="text-2xl font-semibold text-slate-800 mb-6">
               Jobs Applied
@@ -151,7 +152,7 @@ function Applications() {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 text-left text-sm font-medium text-slate-600">
+                  <tr className="bg-slate-100 text-sm font-medium text-slate-600">
                     <th className="px-4 py-3">S. No.</th>
                     <th className="px-4 py-3">Company</th>
                     <th className="px-4 py-3">Job Detail</th>
@@ -162,13 +163,13 @@ function Applications() {
                 </thead>
 
                 <tbody>
-                  {userApplications.map((job, index) => (
+                  {paginatedApplications.map((job, index) => (
                     <tr
                       key={index}
                       className="border-t border-slate-200 text-sm hover:bg-slate-50 transition"
                     >
-                      <td className="px-7 py-4 text-slate-700 ">
-                        {index + 1}.
+                      <td className="px-7 py-4 text-slate-700">
+                        {(currentPage - 1) * JOBS_PER_PAGE + index + 1}.
                       </td>
 
                       <td className="px-4 py-4 flex items-center gap-3 font-medium text-slate-800">
@@ -180,24 +181,17 @@ function Applications() {
                         {job.companyId.name}
                       </td>
 
-                      <td className="px-4 py-4 text-slate-700">
-                        {job.jobId.title}
-                      </td>
-
-                      <td className="px-4 py-4 text-slate-700">
-                        {job.jobId.location}
-                      </td>
-
-                      <td className="px-4 py-4 text-slate-700">
+                      <td className="px-4 py-4">{job.jobId.title}</td>
+                      <td className="px-4 py-4">{job.jobId.location}</td>
+                      <td className="px-4 py-4">
                         {moment(job.date).format("ll")}
                       </td>
 
                       <td className="px-4 py-4">
                         <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-      ${statusUI[job.status]?.className || "bg-slate-100 text-slate-600"}`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${statusUI[job.status]?.className}`}
                         >
-                          {statusUI[job.status]?.label || job.status}
+                          {statusUI[job.status]?.label}
                         </span>
                       </td>
                     </tr>
@@ -206,6 +200,44 @@ function Applications() {
               </table>
             </div>
           </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="p-2 rounded border border-slate-300 disabled:opacity-40 cursor-pointer"
+              >
+                <img src={assets.left_arrow_icon} alt="" />
+              </button>
+
+              {Array.from({ length: totalPages }).map((_, index) => {
+                const page = index + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded border text-sm font-medium ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "border-slate-300 text-slate-600 hover:bg-slate-100 cursor-pointer"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                className="p-2 rounded border border-slate-300 disabled:opacity-40 cursor-pointer"
+              >
+                <img src={assets.right_arrow_icon} alt="" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />

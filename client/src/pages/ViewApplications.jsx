@@ -277,7 +277,7 @@ function ViewApplications() {
               disabled={currentPage === 1}
               className="px-4 py-1.5 text-sm font-medium rounded-md border
                  text-slate-600 bg-white hover:bg-slate-100
-                 disabled:opacity-50 disabled:cursor-not-allowed"
+                 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Previous
             </button>
@@ -287,7 +287,7 @@ function ViewApplications() {
               disabled={currentPage === totalPages}
               className="px-4 py-1.5 text-sm font-medium rounded-md border
                  text-slate-600 bg-white hover:bg-slate-100
-                 disabled:opacity-50 disabled:cursor-not-allowed"
+                 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Next
             </button>
