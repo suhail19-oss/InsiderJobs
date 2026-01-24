@@ -3,26 +3,10 @@ import User from "../models/user.js";
 
 export const clerkWebHooks = async (req, res) => {
   try {
-    const payload = Buffer.isBuffer(req.body)
-      ? req.body.toString("utf8")
-      : JSON.stringify(req.body);
-
-    const headers = {
-      "svix-id": req.headers["svix-id"],
-      "svix-timestamp": req.headers["svix-timestamp"],
-      "svix-signature": req.headers["svix-signature"],
-    };
-
-    if (
-      !headers["svix-id"] ||
-      !headers["svix-timestamp"] ||
-      !headers["svix-signature"]
-    ) {
-      throw new Error("Missing Svix headers");
-    }
-
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-    const evt = wh.verify(payload, headers);
+
+    // 🔑 CRITICAL: pass raw body buffer + raw headers
+    const evt = wh.verify(req.body, req.headers);
 
     const { type, data } = evt;
 

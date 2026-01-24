@@ -16,15 +16,13 @@ const app = express();
 await connectDB();
 await connectCloudinary();
 
-app.use(cors());
-
-app.use(express.json());
-
 app.get("/health", (req, res) => {
   res.send("OK");
 });
 
 app.post("/webhooks", express.raw({ type: "application/json" }), clerkWebHooks);
+app.use(cors());
+app.use(express.json());
 
 app.get("/", (req, res) => res.send("API Working"));
 
