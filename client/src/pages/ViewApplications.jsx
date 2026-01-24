@@ -110,7 +110,6 @@ function ViewApplications() {
       </div>
     );
   }
-
   return (
     <div className="container mx-auto p-4 pt-8 md:px-8">
       <div className="mb-6">
@@ -122,10 +121,10 @@ function ViewApplications() {
         </p>
       </div>
 
-      <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-visible">
-        <table className="w-full text-left">
-          <thead className="sticky top-0 bg-slate-50 z-10 border-b border-slate-200">
-            <tr className="border-b border-slate-200">
+      <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-slate-50 border-b border-slate-200">
+            <tr>
               <th className="px-6 py-4 text-sm font-semibold text-slate-700">
                 S.No.
               </th>
@@ -196,7 +195,7 @@ function ViewApplications() {
                     </a>
                   </td>
 
-                  <td className="px-6 py-4 text-center relative">
+                  <td className="px-6 py-4 text-center">
                     {applicant.status === "Pending" ? (
                       <div className="relative inline-block">
                         <button
@@ -215,11 +214,7 @@ function ViewApplications() {
                         </button>
 
                         {openMenuId === applicant._id && (
-                          <div
-                            className="absolute right-0 top-full mt-1 w-48
-                   bg-white border border-slate-200 rounded-xl shadow-lg py-1
-                   z-[100]"
-                          >
+                          <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-[100]">
                             <button
                               onClick={() => {
                                 changeJobApplicationStatus(
@@ -228,9 +223,7 @@ function ViewApplications() {
                                 );
                                 setOpenMenuId(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm
-                     text-indigo-600 hover:bg-indigo-50
-                     transition-colors cursor-pointer"
+                              className="w-full px-4 py-2 text-left text-sm text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
                             >
                               📅 Shortlist for Interview
                             </button>
@@ -243,9 +236,7 @@ function ViewApplications() {
                                 );
                                 setOpenMenuId(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm
-                     text-slate-600 hover:bg-slate-100
-                     transition-colors cursor-pointer"
+                              className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                             >
                               ❌ Not Proceeding
                             </button>
@@ -254,9 +245,10 @@ function ViewApplications() {
                       </div>
                     ) : (
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-      ${statusUI[applicant.status]?.className || "bg-slate-100 text-slate-600"}
-    `}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                          statusUI[applicant.status]?.className ||
+                          "bg-slate-100 text-slate-600"
+                        }`}
                       >
                         {statusUI[applicant.status]?.label || applicant.status}
                       </span>
@@ -275,9 +267,7 @@ function ViewApplications() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
-              className="px-4 py-1.5 text-sm font-medium rounded-md border
-                 text-slate-600 bg-white hover:bg-slate-100
-                 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-4 py-1.5 text-sm font-medium rounded-md border text-slate-600 bg-white hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Previous
             </button>
@@ -285,9 +275,7 @@ function ViewApplications() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="px-4 py-1.5 text-sm font-medium rounded-md border
-                 text-slate-600 bg-white hover:bg-slate-100
-                 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-4 py-1.5 text-sm font-medium rounded-md border text-slate-600 bg-white hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Next
             </button>

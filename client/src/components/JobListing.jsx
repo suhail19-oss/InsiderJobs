@@ -327,7 +327,7 @@ function JobListing() {
 
                     <p className="text-sm text-slate-500 max-w-sm">
                       Jobs will appear here once Companies start posting
-                      Openings.
+                      openings.
                     </p>
                   </div>
                 ) : (
