@@ -7,8 +7,8 @@ export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const { user } = useUser();
-  const { getToken } = useAuth();
+  const { user, isLoaded: isUserLoaded } = useUser();
+  const { getToken, isLoaded: isAuthLoaded } = useAuth();
   const [searchFilter, setSearchFilter] = useState({ title: "", location: "" });
   const [isSearched, setIsSearched] = useState(false);
   const [jobs, setJobs] = useState([]);
@@ -65,11 +65,11 @@ export const AppContextProvider = (props) => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (isUserLoaded && isAuthLoaded && user) {
       fetchUserData();
       fetchUserApplications();
     }
-  }, [user]);
+  }, [isUserLoaded, isAuthLoaded, user]);
 
   const fetchJobs = async () => {
     try {
