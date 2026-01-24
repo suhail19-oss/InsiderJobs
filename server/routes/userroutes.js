@@ -1,4 +1,5 @@
 import express from "express";
+import { requireAuth } from "@clerk/express";
 import {
   applyForJob,
   getUserData,
@@ -10,11 +11,12 @@ import uploadPDF from "../config/multerpdf.js";
 
 const router = express.Router();
 
-router.get("/", getUserData);
-router.post("/apply", applyForJob);
-router.get("/applications", getUserJobApplications);
+router.get("/", requireAuth(), getUserData);
+router.post("/apply", requireAuth(), applyForJob);
+router.get("/applications", requireAuth(), getUserJobApplications);
 router.post(
   "/update-resume",
+  requireAuth(),
   uploadPDF.single("resume"),
   multerErrorHandler,
   updateUserResume,
