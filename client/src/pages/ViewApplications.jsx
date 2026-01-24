@@ -122,7 +122,7 @@ function ViewApplications() {
         </p>
       </div>
 
-      <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-visible">
         <table className="w-full text-left">
           <thead className="sticky top-0 bg-slate-50 z-10 border-b border-slate-200">
             <tr className="border-b border-slate-200">
@@ -196,7 +196,7 @@ function ViewApplications() {
                     </a>
                   </td>
 
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-6 py-4 text-center relative">
                     {applicant.status === "Pending" ? (
                       <div className="relative inline-block">
                         <button

@@ -24,7 +24,6 @@ function Dashboard() {
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
         <div className="container mx-auto px-4 2xl:px-20 py-4 flex items-center justify-between">
           <img
-            onClick={() => navigate("/")}
             src={assets.logo}
             alt="Logo"
             className="h-8 sm:h-9 cursor-pointer"

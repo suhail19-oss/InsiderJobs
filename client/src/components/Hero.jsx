@@ -12,6 +12,16 @@ function Hero() {
       title: titleRef.current.value,
       location: locationRef.current.value,
     });
+
+    if (titleRef.current) titleRef.current.value = "";
+    if (locationRef.current) locationRef.current.value = "";
+
+    setTimeout(() => {
+      const section = document.getElementById("job-list");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
     setIsSearched(true);
   };
 

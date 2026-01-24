@@ -117,7 +117,7 @@ function Applications() {
                 <button
                   onClick={updateResume}
                   disabled={!resume}
-                  className="px-6 py-2 rounded-xl font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
+                  className="px-6 py-2 rounded-xl font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition cursor-pointer"
                 >
                   Save
                 </button>
@@ -128,14 +128,14 @@ function Applications() {
                   href={userData?.resume}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border bg-indigo-50 text-indigo-700 font-medium hover:bg-indigo-100 transition"
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border bg-indigo-50 text-indigo-700 font-medium hover:bg-indigo-100 transition cursor-pointer"
                 >
                   View Resume
                 </a>
 
                 <button
                   onClick={() => setIsEdit(true)}
-                  className="px-5 py-2 rounded-xl border text-slate-600 hover:bg-slate-100 transition"
+                  className="px-5 py-2 rounded-xl border text-slate-600 hover:bg-slate-100 transition cursor-pointer"
                 >
                   Edit
                 </button>

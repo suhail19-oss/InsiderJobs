@@ -17,6 +17,14 @@ function JobListing() {
   const JOBS_PER_PAGE = 6;
   const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
 
+  const hasAnyJobs = jobs.length > 0;
+
+  const hasActiveFilters =
+    searchFilter.title ||
+    searchFilter.location ||
+    selectedCategories.length > 0 ||
+    selectedLocations.length > 0;
+
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) =>
       prev.includes(category)
@@ -305,29 +313,53 @@ function JobListing() {
               </p>
 
               {filteredJobs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <img
-                    src={assets.search_icon}
-                    alt=""
-                    className="w-14 h-14 opacity-40 mb-4"
-                  />
+                jobs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-24 text-center">
+                    <img
+                      src={assets.search_icon}
+                      alt=""
+                      className="w-16 h-16 opacity-30 mb-4"
+                    />
 
-                  <h4 className="text-lg font-semibold text-slate-800 mb-2">
-                    No jobs found
-                  </h4>
+                    <h4 className="text-lg font-semibold text-slate-800 mb-2">
+                      No Jobs Available Yet
+                    </h4>
 
-                  <p className="text-sm text-slate-500 max-w-sm">
-                    We couldn’t find any jobs matching your selected filters.
-                    Try adjusting or clearing the filters to see more results.
-                  </p>
+                    <p className="text-sm text-slate-500 max-w-sm">
+                      Jobs will appear here once Companies start posting
+                      Openings.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <img
+                      src={assets.search_icon}
+                      alt=""
+                      className="w-14 h-14 opacity-40 mb-4"
+                    />
 
-                  <button
-                    onClick={clearFilters}
-                    className="mt-6 px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
+                    <h4 className="text-lg font-semibold text-slate-800 mb-2">
+                      No jobs found
+                    </h4>
+
+                    <p className="text-sm text-slate-500 max-w-sm">
+                      We couldn’t find any jobs matching your selected filters.
+                      Try adjusting or clearing the filters to see more results.
+                    </p>
+
+                    {(searchFilter.title ||
+                      searchFilter.location ||
+                      selectedCategories.length > 0 ||
+                      selectedLocations.length > 0) && (
+                      <button
+                        onClick={clearFilters}
+                        className="mt-6 px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
+                )
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredJobs
@@ -343,13 +375,9 @@ function JobListing() {
                   <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    className="p-2 rounded border border-slate-300 disabled:opacity-40"
+                    className="p-2 rounded border border-slate-300 disabled:opacity-40 cursor-pointer"
                   >
-                    <img
-                      src={assets.left_arrow_icon}
-                      alt=""
-                      className="cursor-pointer"
-                    />
+                    <img src={assets.left_arrow_icon} alt="" />
                   </button>
 
                   {Array.from({ length: totalPages }).map((_, index) => {
@@ -361,7 +389,7 @@ function JobListing() {
                         className={`w-10 h-10 rounded border text-sm font-medium transition cursor-pointer ${
                           currentPage === page
                             ? "bg-blue-600 text-white border-blue-600"
-                            : "border-slate-300 text-slate-600 hover:bg-slate-100"
+                            : "border-slate-300 text-slate-600 hover:bg-slate-100 cursor-pointer"
                         }`}
                       >
                         {page}
@@ -376,11 +404,7 @@ function JobListing() {
                     }
                     className="p-2 rounded border border-slate-300 disabled:opacity-40 cursor-pointer"
                   >
-                    <img
-                      src={assets.right_arrow_icon}
-                      alt=""
-                      className="cursor-pointer"
-                    />
+                    <img src={assets.right_arrow_icon} alt="" />
                   </button>
                 </div>
               )}

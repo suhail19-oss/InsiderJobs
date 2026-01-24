@@ -52,6 +52,9 @@ function AddJob() {
 
         setTitle("");
         setSalary("");
+        setCategory("Programming");
+        setLocation("Bangalore");
+        setLevel("Beginner Level");
         quillRef.current.root.innerHTML = "";
       } else {
         toast.error(data.message || "Failed to Add Job");
