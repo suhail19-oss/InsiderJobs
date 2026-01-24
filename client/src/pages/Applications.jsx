@@ -74,9 +74,9 @@ function Applications() {
     },
   };
 
-  const validApplications = userApplications.filter(
-    (job) => job.jobId && job.companyId,
-  );
+  const validApplications = userApplications
+    .filter((job) => job.jobId && job.companyId)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const totalPages = Math.ceil(validApplications.length / JOBS_PER_PAGE);
 
