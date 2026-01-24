@@ -12,20 +12,38 @@ import userRoutes from "./routes/userroutes.js";
 import { clerkMiddleware } from "@clerk/express";
 
 const app = express();
+
 await connectDB();
 await connectCloudinary();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://insiderjobs-client.onrender.com/",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "token"],
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.send("OK");
+});
 
 app.post("/webhooks", express.raw({ type: "application/json" }), clerkWebHooks);
 
-app.use(express.json());
+app.get("/", (req, res) => res.send("API Working"));
+
 app.use(clerkMiddleware());
 
-app.get("/", (req, res) => res.send("API Working"));
 app.use("/api/company", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/user", userRoutes);
+
 app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
