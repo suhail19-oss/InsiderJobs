@@ -63,5 +63,3 @@ The project emphasizes **scalability, reliability, and real-world engineering pr
 - JWT (Recruiter Authentication)
 - Resend (Email Service)
 - **Sentry (Error Monitoring & Performance Tracking)**
-git clone https://github.com/your-username/insiderjobs.git
-cd insiderjobs
